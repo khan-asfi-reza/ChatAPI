@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, name, gender, email, password):
+    def create_user(self, username, name, gender, email, password=None):
         user = self.model.objects.filter(username=username, email=email)
         if self.model.objects.filter(username=username).exists():
             raise ValidationError('Username already exists')

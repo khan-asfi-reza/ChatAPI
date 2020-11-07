@@ -16,7 +16,7 @@ class UserAdminInterface(BaseUserAdmin):
     list_display = ('username', 'id', 'name', 'email', 'gender',)
     list_filter = ('admin',)
     fieldsets = (
-        (None, {'fields': ('username', 'email',)}),
+        (None, {'fields': ('username', 'email','password')}),
         ('Personal info', {'fields': ('name', 'gender',)}),
 
     )

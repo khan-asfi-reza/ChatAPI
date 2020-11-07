@@ -71,7 +71,7 @@ class UserCRUDView(viewsets.ModelViewSet):
         # checks if serializer is valid
         if serializer.is_valid():
             # saves user information
-            user = serializer.save(user=request.user)
+            user = serializer.save()
             # Return data
             token, created = Token.objects.get_or_create(user=user)
             data = {'token': token.key, 'user': serializer.data}
@@ -111,7 +111,7 @@ class ProfileCreateListUpdateView(viewsets.ModelViewSet):
     serializer_class = ProfileRetrieveSerializer
     create_serializer_class = ProfileCreateSerializer
     queryset = Profile.objects.all()
-    authentication_classes = TokenAuthentication
+    authentication_classes = [TokenAuthentication]
     model = Profile
     permission_classes = [IsAuthenticated]
     pagination_class = ProfilePagination
@@ -149,7 +149,7 @@ class ProfileRetrieveView(viewsets.ModelViewSet):
     serializer_class = ProfileRetrieveSerializer
     create_serializer_class = ProfileCreateSerializer
     queryset = Profile.objects.all()
-    authentication_classes = TokenAuthentication
+    authentication_classes = [TokenAuthentication]
     model = Profile
     permission_classes = [IsAuthenticated]
 

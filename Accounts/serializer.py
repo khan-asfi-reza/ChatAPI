@@ -19,6 +19,15 @@ class UserSerializer(ModelSerializer):
             'password': {'write_only': True}
         }
 
+    def create(self, validated_data):
+        user = User.objects.create(username=self.validated_data['username'],
+                                   email=self.validated_data['email'],
+                                   gender=self.validated_data['gender'],
+                                   name=self.validated_data['name']
+                                   )
+        user.set_password(self.validated_data['password'])
+        user.save()
+        return user
 
 class UserRetrieveSerializer(ModelSerializer):
     class Meta:
@@ -42,7 +51,7 @@ class AuthenticationSerializer(Serializer):
         except User.DoesNotExist:
             raise ValidationError({'error': 'Account does not exist'}, code='authentication')
         user = authenticate(request=self.context.get('request'),
-                            name=username,
+                            username=username,
                             password=password)
         if not user:
             msg = "Incorrect password"

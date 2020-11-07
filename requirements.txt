@@ -21,6 +21,7 @@ cryptography==3.0
 daphne==2.5.0
 Django==3.0.8
 django-cors-headers==3.4.0
+django-encrypted-model-fields==0.5.8
 django-filter==2.3.0
 django-localflavor==3.0.1
 django-localflavor-us==1.1
