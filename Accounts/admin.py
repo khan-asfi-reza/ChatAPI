@@ -18,7 +18,7 @@ class UserAdminInterface(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'email',)}),
         ('Personal info', {'fields': ('name', 'gender',)}),
-        ('Permissions', {'fields': ('admin', 'staff')}),
+
     )
     add_fieldsets = (
         (None, {
