@@ -19,12 +19,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'YOUR_SECRET_KEY') # Your secret key
+SECRET_KEY = os.environ.get('SECRET_KEY', 'YOUR_SECRET_KEY')  # Your secret key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://django-chat-api.herokuapp.com','0.0.0.0','127.0.0.1','localhost']
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
