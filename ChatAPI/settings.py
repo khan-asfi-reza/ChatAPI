@@ -107,7 +107,6 @@ DATABASES = {
         'PASSWORD': os.environ.get('DATABASE_PASSWORD')
     },
 }
-# postgres://mwizoelunwzuam:5dcf520bbe35c32a0cb9eea5e791e330c80e39198d381ab9176025bd96cd2d05@ec2-52-31-233-101.eu-west-1.compute.amazonaws.com:5432/ddmuj0qi3gspbc
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
