@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('SECRET_KEY', 'YOUR_SECRET_KEY')  # Your secret key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -130,12 +130,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ORIGIN_WHITELIST = [
-    'https://django-chat-api.herokuapp.com',
-]
-CORS_ORIGIN_REGEX_WHITELIST = [
-    'https://django-chat-api.herokuapp.com',
-]
+CORS_ORIGIN_ALLOW_ALL = True
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
