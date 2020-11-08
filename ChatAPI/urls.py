@@ -30,8 +30,7 @@ urlpatterns = [
                   path('<username>/', views.ChatView.as_view(), name='chat'),
                   path('', views.HomeView.as_view(), name='home'),
 
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL,
-                                                                                         document_root=settings.STATIC_ROOT)
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 admin.site.site_header = 'ChatAPI Admin'
 admin.site.site_title = "ChatAPI"
