@@ -14,6 +14,7 @@ from Chat.models import Inbox, ChatMessage
 from Chat.serializers import InboxSerializer, MessageSerializer
 from Accounts.models import Profile
 from channels.layers import get_channel_layer
+
 channel_layer = get_channel_layer()
 User = get_user_model()
 
@@ -41,7 +42,7 @@ class UserInboxView(ModelViewSet):
     @action(methods='get', detail=True)
     def retrieve(self, request, *args, **kwargs):
         try:
-            user_profile = Profile.objects.get(user__name=self.kwargs.get('user'))
+            user_profile = Profile.objects.get(user__username=self.kwargs.get('user'))
             serializer = self.serializer_class(instance=user_profile, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Profile.DoesNotExist:
@@ -53,17 +54,13 @@ class InboxMessageView(ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     pagination_class = ProfilePagination
+    lookup_field = 'user'
 
     def get_queryset(self):
         try:
-            other_user = User.objects.get(name=self.kwargs.get('username'))
-            try:
-                inbox = Inbox.objects.get(user=self.request.user, second=other_user)
-                return ChatMessage.objects.filter(inbox=inbox).order_by('-timestamp')
-            except Inbox.DoesNotExist:
-                return []
-
-        except User.DoesNotExist:
+            inbox = Inbox.objects.get(user=self.request.user, second__username=self.kwargs.get('user'))
+            return ChatMessage.objects.filter(inbox=inbox).order_by('-timestamp')
+        except Inbox.DoesNotExist:
             return []
 
 
@@ -75,4 +72,3 @@ class InboxListView(ModelViewSet):
 
     def get_queryset(self):
         return Inbox.objects.filter(user=self.request.user).order_by('-updated')
-

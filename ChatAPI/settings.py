@@ -38,12 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'crispy_forms',
     'encrypted_fields',
     'django_filters',
     'Accounts',
     'Chat'
 ]
-
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -58,11 +59,11 @@ FIELD_ENCRYPTION_KEYS = [
     "f164ec6bd6fbc4aef5647abc15199da0f9badcc1d2127bde2087ae0d794a9a0b"
 ]
 ROOT_URLCONF = 'ChatAPI.urls'
-
+TEMPLATE_DIR = f"{BASE_DIR}/Template/"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,7 +83,6 @@ CHANNEL_LAYERS = {
         "CONFIG": {"hosts": [os.environ.get("REDIS_URL", "redis://localhost:6379")]},
     },
 }
-
 
 AUTH_USER_MODEL = 'Accounts.User'
 WSGI_APPLICATION = 'ChatAPI.wsgi.application'
@@ -140,6 +140,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/Static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'Static')
-MEDIA_ROOT = f"{BASE_DIR}/Media/"
-MEDIA_URL = f"/Media/"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "Static"),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, "Static/Static_Root/")
+MEDIA_ROOT = os.path.join(BASE_DIR, 'Media')
+MEDIA_URL = '/Media/'
+
+LOGIN_REDIRECT_URL = 'home'
+LOGIN_URL = 'login'

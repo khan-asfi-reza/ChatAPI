@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <style>
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  width: 5px;
+  background: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  width: 1em;
+  background-color: #ddd;
+  outline: 1px solid slategrey;
+  border-radius: 1rem;
+}
+
+.text-small {
+  font-size: 0.9rem;
+}
+
+.messages-box,
+.chat-box {
+  height: 510px;
+  overflow-y: scroll;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+input::placeholder {
+  font-size: 0.9rem;
+  color: #999;
+}
+    </style>
+{% endblock %}
+{% block main %}
+<div id="app" class="container py-5 px-4">
+  <div class="row bg-white">
+      <div class="col-3">
+          <p style="font-size: 1.5rem">{{ username }}</p>
+      </div>
+  </div>
+  <div class="row rounded-lg overflow-hidden shadow">
+
+    <!-- Users box-->
+    <!-- Chat Box-->
+    <div class="col-12 px-0">
+
+      <div id="chatBox" class="px-4 py-5 chat-box bg-white">
+
+        <!-- Sender Message-->
+        <div v-for="item in inbox" :class="item.user.username === username ?'media w-50 mb-3':'media w-50 ml-auto mb-3'">
+            <img v-if="item.user.username === username" src="https://res.cloudinary.com/mhmd/image/upload/v1564960395/avatar_usae7z.svg" alt="user" width="50" class="rounded-circle">
+          <div :class="item.user.username === username ? 'media-body ml-3': 'media-body'">
+            <div :class="item.user.username === username ?'bg-light rounded py-2 px-3 mb-2':'bg-primary rounded py-2 px-3 mb-2'">
+              <p :class="item.user.username === username ? 'text-small mb-0 text-muted': 'text-light'">[[item.message]]</p>
+            </div>
+            <p class="small text-muted">[[item.timestamp]]</p>
+          </div>
+        </div>
+
+        <!-- Reciever Message-->
+        <div id="scrollIntoView"></div>
+      <!-- Typing area -->
+    </div>
+        <form id="form" class="bg-light">
+        <div class="input-group">
+          <input id="msgInput" type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light">
+          <div class="input-group-append">
+            <button id="button-addon" type="submit" class="btn btn-link"> <i class="fa fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </form>
+  </div>
+</div>
+</div>
+<script src={% static 'js/api.js' %}></script>
+<script>
+
+    const app = new Vue({
+        el:'#app',
+        delimiters: ['[[', ']]'],
+        data:{
+            username:`{{ username }}`,
+            token:'{{ token }}',
+            loading:'false',
+            next:1,
+            inbox:[]
+        },
+        methods:{
+        getInbox:function(){
+          if(this.next !== null){
+              this.loading = true;
+              axios.get(`${root_api}{% url 'inbox-message' username %}?page=${this.next}`,{
+              headers:{
+                  Authorization:`Token {{ token }}`
+              }
+              }).then((res)=>{
+                  this.inbox = [...res.data.results.reverse(),...this.inbox];
+                  this.next = res.data.next !== null?this.next+1:null;
+                  this.loading = false;
+                  const scrlView = document.getElementById('scrollIntoView');
+                  scrlView.scrollIntoView();
+                  scrlView.scrollTop = scrlView.scrollHeight;
+              }).catch((e)=>{
+                  console.log(e.response)
+              })
+          }
+      },
+        },
+        mounted(){
+            const scrlView = document.getElementById('scrollIntoView');
+            scrlView.scrollIntoView();
+            scrlView.scrollTop = scrlView.scrollHeight;
+            this.getInbox();
+            const ws = `${root_socket}/ws/chat/{{username}}/?token={{ token }}`;
+            const websocket = new WebSocket(ws);
+
+            const setInbox = (data) =>{
+                this.inbox = [...this.inbox,data]
+            };
+
+            websocket.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                setInbox(data);
+            };
+            const inp = document.getElementById('msgInput');
+            const form = document.getElementById('form');
+            form.onsubmit = function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if(inp.value !== ''){
+                    websocket.send(JSON.stringify({
+                        message: inp.value
+                    }));
+                    inp.value = '';
+                    scrlView.scrollIntoView();
+                }
+            };
+
+        },
+
+
+    })
+</script>
+
+{% endblock main%}

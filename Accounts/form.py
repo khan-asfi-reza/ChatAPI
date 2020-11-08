@@ -51,3 +51,18 @@ class UserAdminCreationForm(forms.ModelForm):
         return user
 
 
+class LoginForm(forms.Form):
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username'}),
+                               label="Username",
+                               required=True)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'placeholder': 'Enter password'}),
+                               required=True)
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        return username
+
+    def clean_password(self):
+        # Check that the two password entries match
+        password = self.cleaned_data.get("password")
+        return password

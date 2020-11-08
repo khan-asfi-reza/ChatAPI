@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+
+    <style>
+    .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid transparent;
+    border-radius: 0;
+}
+.mailbox-widget .custom-tab .nav-item .nav-link {
+    border: 0;
+    color: #fff;
+    border-bottom: 3px solid transparent;
+}
+.mailbox-widget .custom-tab .nav-item .nav-link.active {
+    background: 0 0;
+    color: #fff;
+    border-bottom: 3px solid #2cd07e;
+}
+.no-wrap td, .no-wrap th {
+    white-space: nowrap;
+}
+.table td, .table th {
+    padding: .9375rem .4rem;
+    vertical-align: top;
+    border-top: 1px solid rgba(120,130,140,.13);
+}
+.font-light {
+    font-weight: 300;
+}
+    </style>
+
+{% endblock %}
+{% block main %}
+
+<div class="container" id="app">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body bg-light text-dark mailbox-widget pb-0">
+                    <h2 class="text-dark pb-3">Your Inbox</h2>
+                    <ul class="nav nav-tabs custom-tab border-bottom-0 mt-4" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="inbox-tab" data-toggle="tab" aria-controls="inbox" href="#inbox" role="tab" aria-selected="true">
+                                <span class="d-block d-md-none"><i class="ti-email"></i></span>
+                                <span class="d-none d-md-block text-dark"> INBOX</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade active show" id="inbox" aria-labelledby="inbox-tab" role="tabpanel">
+                        <div>
+                            <div class="row p-4 no-gutters align-items-center">
+
+                            </div>
+                            <!-- Mail list-->
+                            <div class="table-responsive">
+                                <table class="table email-table no-wrap table-hover v-middle mb-0 font-14">
+
+
+
+                                    <tbody v-for="every in inbox" :key="every.id" >
+                                        <!-- row -->
+                                        <tr>
+                                            <!-- label -->
+                                            <!-- star -->
+                                            <td v-on:click="onClickBody(every.second.user.username)"><i class="fa fa-star text-warning"></i></td>
+                                            <td v-on:click="onClickBody(every.second.user.username)">
+                                                <span class="mb-0 text-muted">[[every.second.user.username]]</span>
+                                            </td>
+                                            <!-- Message -->
+                                            <td>
+                                                <a v-bind:href="`${root_api}/${every.second.user.username}`">
+                                                    <span class="text-dark">[[every.last_message]]</span>
+                                                </a>
+                                            </td>
+                                            <!-- Attachment -->
+                                            <td><i class="fa fa-paperclip text-muted"></i></td>
+                                            <!-- Time -->
+                                            <td class="text-muted">[[every.updated]]</td>
+                                            <td>
+                                                <button v-on:click="deleteOnClick(every.id, every.second.user.username)" class="btn btn-danger">Delete</button>
+                                            </td>
+                                        </tr>
+                                        <!-- row -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src={% static 'js/api.js' %}></script>
+<script>
+
+const app = new Vue({
+    el:'#app',
+    delimiters: ['[[', ']]'],
+    data:{
+        token:'{{ token }}',
+        loading:'false',
+        next:1,
+        inbox:[
+
+        ],
+        root_api:root_api
+    },
+    methods:{
+      getInbox:function(){
+          if(this.next !== null){
+              this.loading = true;
+              axios.get(`${root_api}{% url 'inbox' %}?page=${this.next}`,{
+              headers:{
+                  Authorization:`Token {{ token }}`
+              }
+              }).then((res)=>{
+                  this.inbox = [...this.inbox, ...res.data.results];
+                  this.next = res.data.next !== null?this.next+1:null;
+                  this.loading = false
+              }).catch((e)=>{
+                  console.log(e)
+              })
+          }
+      },
+      onClickBody:function (username) {
+          location.href = `${root_api}/${username}`
+      },
+      deleteOnClick:function (id, username) {
+          axios.delete(`${root_api}/api/chat/inbox/delete/${username}/`,{
+              headers:{
+                  Authorization:`Token {{ token }}`
+              }
+              }).then((res)=>{
+              this.inbox = this.inbox.filter((e) => e.id !== id);
+              }).catch((e)=>{
+                  console.log(e)
+              })
+      }
+
+    },
+
+    mounted(){
+        const setInbox = (inbox, stateInbox) => {
+            const {type, payload} = inbox;
+            let newInbox;
+            if (type === 'read_update') {
+                const array = stateInbox;
+                const index = array.findIndex((obj => obj.id === payload.id));
+                array[index] = payload;
+                newInbox = [...array];
+                this.inbox = newInbox;
+
+            } else {
+                if (stateInbox.length > 0) {
+                    const arr = stateInbox.filter(each => payload.id !== each.id);
+                    this.inbox = [payload, ...arr];
+                } else {
+                    this.inbox = [payload]
+                }
+            }
+        };
+
+      const ws = new WebSocket(`${root_socket}/ws/inbox/?token={{ token }}`);
+      const ws2 = new WebSocket(`${root_socket}/ws/status/?token={{ token }}`);
+      ws.onmessage = (e) => {
+         const data = JSON.parse(e.data);
+         setInbox(data, this.inbox)
+      };
+    },
+
+    beforeMount(){
+        this.getInbox()
+    }
+})
+</script>
+{% endblock %}
+

@@ -23,7 +23,7 @@ class ThreadManager(models.Manager):
 
     def get_or_new(self, user, other_name):
         # get_or_create -> Finds existing thread or creates new one
-        username = user.name
+        username = user.username
         if username == other_name:
             return None
         qlookup1 = Q(first__username=username) & Q(second__username=other_name)
@@ -35,7 +35,7 @@ class ThreadManager(models.Manager):
             return qs.order_by('timestamp').first(), False
         else:
             try:
-                user2 = User.objects.get(name=other_name)
+                user2 = User.objects.get(username=other_name)
             except User.DoesNotExist:
                 return None, False
             if user != user2:

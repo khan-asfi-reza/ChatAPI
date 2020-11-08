@@ -87,12 +87,13 @@ class MessageConsumer(AsyncJsonWebsocketConsumer, TokenAuth):
     # Connects To Message Consumer
     async def connect(self):
         user = await self.get_user()
-        second_user = self.scope['url_route']['kwargs']['username']
-        thread = await self.get_thread(user, second_user)
-        await self.read_user_inbox(user, second_user)
-        # Add to channel layer
-        await self.channel_layer.group_add(f"thread_{thread.id}", self.channel_name)
-        await self.accept()
+        if user is not None:
+            second_user = self.scope['url_route']['kwargs']['username']
+            thread = await self.get_thread(user, second_user)
+            await self.read_user_inbox(user, second_user)
+            # Add to channel layer
+            await self.channel_layer.group_add(f"thread_{thread.id}", self.channel_name)
+            await self.accept()
 
     # Disconnects
     async def disconnect(self, code):
@@ -127,9 +128,13 @@ class MessageConsumer(AsyncJsonWebsocketConsumer, TokenAuth):
 
     @database_sync_to_async
     def get_inbox(self, user, other_user):
-        user_inbox, created = Inbox.objects.get_or_create(user=user, second__username=other_user)
-        other_user_inbox, created = Inbox.objects.get_or_create(user__username=other_user, second=user)
-        return [user_inbox, other_user_inbox]
+        try:
+            second_user = User.objects.get(username=other_user)
+            user_inbox, created = Inbox.objects.get_or_create(user=user, second=second_user)
+            other_user_inbox, created = Inbox.objects.get_or_create(user=second_user, second=user)
+            return [user_inbox, other_user_inbox]
+        except User.DoesNotExist:
+            return []
 
     @database_sync_to_async
     def read_user_inbox(self, user, other_user):

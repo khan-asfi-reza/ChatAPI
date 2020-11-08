@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-
+Static/Static_Root
 .idea
 # C extensions
 *.so
@@ -129,3 +129,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+Static/package.json
+Static/package-lock.json
+Static/node_modules

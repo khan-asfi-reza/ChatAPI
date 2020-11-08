@@ -82,7 +82,7 @@ user_model = get_user_model()
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(user_model, on_delete=models.CASCADE)
+    user = models.OneToOneField(user_model, on_delete=models.CASCADE, related_name='user_profile')
     profile_picture = models.ImageField(upload_to=user_directory_path, default='user.png')
     online = models.BooleanField(default=False)
     last_online = models.DateTimeField(auto_now=True)
