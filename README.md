@@ -19,4 +19,16 @@
 5. Paginated messages
 6. Custom User Model
 
+**Database Design**
+
+![alt text](https://github.com/khan-asfi-reza/ChatAPI/blob/master/Media/design.png?raw=true)
+
+**Commands**
+
+`python manage.py createsuperuser`  - To create superuser
+
+`python manage.py collectstatic`
+
+`python manage.py runserver`
+
 _NB: Currently this application does not have any frontend service to demonstrate_
