@@ -19,12 +19,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=5j9c@nzb541_#o#kag1vl7^zev-^c3@db@jc21g@-lkn=r08w'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'YOUR_SECRET_KEY') # Your secret key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://django-chat-api.herokuapp.com','0.0.0.0','127.0.0.1','localhost']
 
 # Application definition
 
@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 FIELD_ENCRYPTION_KEYS = [
-    "f164ec6bd6fbc4aef5647abc15199da0f9badcc1d2127bde2087ae0d794a9a0b"
+    os.environ.get('FIELD_ENCRYPTION_KEYS')
 ]
 ROOT_URLCONF = 'ChatAPI.urls'
 TEMPLATE_DIR = f"{BASE_DIR}/Template/"
@@ -91,12 +91,20 @@ WSGI_APPLICATION = 'ChatAPI.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # },
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DATABASE_NAME'),
+        'HOST': os.environ.get('DATABASE_HOST'),
+        'USER': os.environ.get('DATABASE_USER'),
+        'PORT': 5432,
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD')
+    },
 }
-
+# postgres://mwizoelunwzuam:5dcf520bbe35c32a0cb9eea5e791e330c80e39198d381ab9176025bd96cd2d05@ec2-52-31-233-101.eu-west-1.compute.amazonaws.com:5432/ddmuj0qi3gspbc
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -121,8 +129,13 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
-CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ORIGIN_WHITELIST = [
+    'https://django-chat-api.herokuapp.com',
+]
+CORS_ORIGIN_REGEX_WHITELIST = [
+    'https://django-chat-api.herokuapp.com',
+]
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
