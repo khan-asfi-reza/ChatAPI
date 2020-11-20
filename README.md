@@ -9,7 +9,7 @@
 5. Redis
 6. Heroku
 7. Postgresql
-
+8. VueJS
 **Live server link**
 
 https://django-chat-api.herokuapp.com/
